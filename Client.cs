@@ -179,14 +179,21 @@ public class Client
 
     public void disconnect()
     {
-        Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} Has Disconnected...");
-        ThreadManager.ExecuteOnMainThread(() =>
+        try
         {
-            //any inistilised things destroy
+            Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} Has Disconnected...");
+            ThreadManager.ExecuteOnMainThread(() =>
+            {
+                //any inistilised things destroy
+
+            });
+            tcp.disconnect();
+            udp.disconnect();
         }
-        );
-        tcp.disconnect();
-        udp.disconnect();
+        catch(NullReferenceException r)
+        {
+            Console.Write(r.Message);
+        }
     }
 }
 

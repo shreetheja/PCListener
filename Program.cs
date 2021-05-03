@@ -10,7 +10,7 @@ namespace RummyServer
         {
             Console.Title = "Rummy Game Server";
             isRunning = true;
-
+            DataAboutUser.Initialize();
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
             Server.Start(5, 26950);
@@ -27,6 +27,11 @@ namespace RummyServer
                     GameLogic.Update();
                    
                     _nextLoop = _nextLoop.AddMilliseconds(Constants.MS_PER_TICK);
+                    if (_nextLoop > DateTime.Now)
+                    {
+                        // If the execution time for the next tick is in the future, aka the server is NOT running behind
+                        Thread.Sleep(_nextLoop - DateTime.Now); // Let the thread sleep until it's needed again.
+                    }
                 }
             }
         }

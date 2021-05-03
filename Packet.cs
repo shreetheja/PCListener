@@ -8,13 +8,13 @@ using System.Numerics;
 /// <summary>Sent from server to client.</summary>
 public enum ServerPackets
 {
-    welcome = 1, loginSuccess, invalidLogin, CommandResult, CommandFinalResult, SentFile
+    welcome = 1, loginSuccess, invalidLogin, UIAnswer, QuickActions, CommandResult, CommandFinalResult, SentFile
 }
 
 /// <summary>Sent from client to server.</summary>
 public enum ClientPackets
 {
-    welcomeReceived = 1, SingleCommand, MultiCommands, SendFile
+    welcomeReceived = 1, UIAnswer, QuickActions, SingleCommand, MultiCommands, SendFile
 }
 
 public class Packet : IDisposable
@@ -158,7 +158,7 @@ public class Packet : IDisposable
         Write(_value.Length); // Add the length of the string to the packet
         buffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
     }
-    
+   
     /// <summary>Adds a Values of strings of the list to the packet.</summary>
     /// <param name="_value">The Quaternion to add.</param>
     public void Write(List<string> _value)
@@ -349,8 +349,6 @@ public class Packet : IDisposable
         }
     }
     
-    /// <summary>Reads a list of strings from the packet.</summary>
-    /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
     public List<string> ReadList(bool _moveReadPos = true)
     {
         int count = ReadInt();

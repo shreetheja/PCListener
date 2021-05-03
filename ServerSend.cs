@@ -59,6 +59,11 @@ public class ServerSend
     }
     #endregion
     #region Types of Packets
+    /// <summary>
+    /// Sends a Welcome Message with a Request of password and username
+    /// </summary>
+    /// <param name="_toClient">To which client to send</param>
+    /// <param name="_msg"Message to be sent></param>
     public static void Welcome(int _toClient, string _msg)
     {
         using (Packet _packet = new Packet((int)ServerPackets.welcome))
@@ -71,6 +76,10 @@ public class ServerSend
         Console.WriteLine("Sent Request of username and passoword");
 
     }
+    /// <summary>
+    /// To denote the invalid Login Password or username wrong
+    /// </summary>
+    /// <param name="_toClient"></param>
     public static void InvalidLoginId(int _toClient)
     {
         using (Packet _packet = new Packet((int)ServerPackets.invalidLogin))
@@ -82,6 +91,10 @@ public class ServerSend
         }
         Console.WriteLine("Sent Request of username and passoword login was invalid");
     }
+    /// <summary>
+    /// Denots login suceccews
+    /// </summary>
+    /// <param name="_toClient"></param>
     public static void LoginSuccess(int _toClient)
     {
         using (Packet _packet = new Packet((int)ServerPackets.loginSuccess))
@@ -93,36 +106,90 @@ public class ServerSend
         }
         Console.WriteLine("Sent Request of success");
     }
-    public static void sendCommandResults(int _toClient, List<string> res)
+
+    //public static void sendCommandResults(int _toClient, string Command, List<string> res)
+    //{
+    //    Console.WriteLine("Sending Command Results : " + res);
+    //    using(Packet _packet = new Packet((int)ServerPackets.CommandResult))
+    //    {
+    //        _packet.Write(Command);
+    //        _packet.Write(res.Count);
+    //        _packet.Write(res);
+
+    //        SendTCPData(_toClient, _packet);
+    //    }
+
+    //} //not used after async
+
+
+    /// <summary>
+    /// Sending the Result Line By line asynchronously
+    /// </summary>
+    /// <param name="_toClient"></param>
+    /// <param name="Command">Command which is stored in form of list shud be sent in list form to match the type in client side</param>
+    /// <param name="res">Result line </param>
+    public static void sendCommandResultLine(int _toClient, string Command, string res) 
     {
-        Console.WriteLine("Sending Command Results : " + res);
+        Console.WriteLine("Sending Result Line: "+res);
         using (Packet _packet = new Packet((int)ServerPackets.CommandResult))
         {
-            _packet.Write(res.Count);
-            _packet.Write(res);
-
-            SendTCPData(_toClient, _packet);
-        }
-
-    }
-    public static void sendCommandResultLine(int _toClient, string res)
-    {
-        Console.WriteLine("Sending Result Line ....");
-        using (Packet _packet = new Packet((int)ServerPackets.CommandResult))
-        {
+            _packet.Write(Command);
             _packet.Write(res);
             SendTCPData(_toClient, _packet);
         }
     }
-    public static void sendEndOfCommandResult(int _toClient, string Finalres)
+    ///// <summary>
+    ///// Sending the Result Line By line asynchronously this is end of command 
+    ///// </summary>
+    ///// <param name="_toClient"></param>
+    ///// <param name="Commands"></param>
+    ///// <param name="Finalres"></param>
+    //public static void sendEndOfCommandResult(int _toClient, List<string> Commands, string Finalres)    
+    //{
+    //    Console.WriteLine("Sending Final Signal Line ....");
+    //    using (Packet _packet = new Packet((int)ServerPackets.CommandFinalResult))
+    //    {
+    //        _packet.Write(Commands);
+    //        _packet.Write(Finalres);
+    //        SendTCPData(_toClient, _packet);
+    //    }
+    //}
+    ///// <summary>
+    ///// Sending the Result Line By line asynchronously
+    ///// </summary>
+    ///// <param name="_toClient"></param>
+    ///// <param name="Commands"></param>
+    ///// <param name="res"></param>
+    //public static void sendCommandResultLine(int _toClient, List<string> Commands, string res)
+    //{
+    //    Console.WriteLine("Sending Result Line ....");
+    //    using (Packet _packet = new Packet((int)ServerPackets.CommandResult))
+    //    {
+    //        _packet.Write(Commands);
+    //        _packet.Write(res);
+    //        SendTCPData(_toClient, _packet);
+    //    }
+    //}
+    /// <summary>
+    /// Sending the Result Line By line asynchronously this is end of command 
+    /// </summary>
+    /// <param name="_toClient"></param>
+    /// <param name="Command"></param>
+    /// <param name="Finalres"></param>
+    public static void sendEndOfCommandResult(int _toClient, string Command, string Finalres)
     {
-        Console.WriteLine("Sending Final Signal Line ....");
+        Console.WriteLine("Sending Final Signal Line ...."+Command);
         using (Packet _packet = new Packet((int)ServerPackets.CommandFinalResult))
         {
+            _packet.Write(Command);
             _packet.Write(Finalres);
             SendTCPData(_toClient, _packet);
         }
     }
+    /// <summary>
+    /// </summary>
+    /// <param name="_toClient"></param>
+    /// <param name="path"></param>
     public static void SendFile(int _toClient, string path)
     {
         using (Packet _packet = new Packet((int)ServerPackets.SentFile))

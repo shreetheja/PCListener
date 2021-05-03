@@ -30,63 +30,59 @@ public class ServerHandle
             Server.clients[_fromClient].disconnect();
         }
     }
-    public static void SingleLineCommand(int _fromClient, Packet _packet)
+    public async static void SingleLineCommand(int _fromClient, Packet _packet)
     {
-        int clientIdCheck = _packet.ReadInt();
-        string username = _packet.ReadString();
-        string password = _packet.ReadString();
-        bool nircmd = _packet.ReadBool();
-        string command = _packet.ReadString();
-        Console.WriteLine("Handling a single Line command: " + command);
-        if (clientIdCheck == _fromClient)
+        if (CheckPacketValidity(_fromClient, _packet))
         {
-            if (DataAboutUser.UsnPwd.ContainsKey(username))
+            bool nircmd = _packet.ReadBool();
+            string command = _packet.ReadString();
+            Console.WriteLine("Handling Command : " + command);
+            OSManager instance = new OSManager();
+            string[] commands = command.Split('\n');
+            if (commands.Length > 1)
             {
-                if (DataAboutUser.UsnPwd[username] == password)
-                {
-                    OSManager.instance.RunSingleCommand(command, _fromClient, nircmd);
-                }
-                else
-                    Console.WriteLine($"The client password not matching");
-
+                Console.WriteLine("RUNSINGLELINE : " + command);
+                await instance.RunSingleCommand(command, _fromClient, nircmd);
             }
             else
-                Console.WriteLine($"The client username not matching");
-
+            {
+                Console.WriteLine("RUNMULTI : " + command);
+                await instance.RunMultilineCommands(new List<string>() { command}, _fromClient, nircmd);
+            }
         }
-        else
-            Console.WriteLine($"The client id is not matching");
-
-
     }
-    public static void MultiLineCommands(int _fromClient, Packet _packet)
+    //public static void MultiLineCommands(int _fromClient, Packet _packet)
+    //{
+    //    if (CheckPacketValidity(_fromClient, _packet))
+    //    {
+    //        bool nircmd = _packet.ReadBool();
+    //        List<string> commandList = _packet.ReadList();
+    //        Console.WriteLine("Handling Command Lenght: " + commandList.Count);
+    //        OSManager instance = new OSManager();
+    //        instance.RunMultilineCommands(commandList, _fromClient, nircmd);
+    //    }
+    //}
+    public static void QuickActionCommand(int _fromClient, Packet _packet)
     {
-        int clientIdCheck = _packet.ReadInt();
-        string username = _packet.ReadString();
-        string password = _packet.ReadString();
-        bool nircmd = _packet.ReadBool();
-        List<string> commandList = _packet.ReadList();
-        Console.WriteLine("Handling the Multiline Command of Lenght : " + commandList.Count);
-        if (clientIdCheck == _fromClient)
+        if (CheckPacketValidity(_fromClient, _packet))
         {
-            if (DataAboutUser.UsnPwd.ContainsKey(username))
-            {
-                if (DataAboutUser.UsnPwd[username] == password)
-                {
-                    OSManager.instance.RunMultilineCommands(commandList, _fromClient, nircmd);
-                }
-                else
-                    Console.WriteLine($"The client password not matching");
-
-            }
-            else
-                Console.WriteLine($"The client username not matching");
-
+            bool nircmd = _packet.ReadBool();
+            List<string> commands = _packet.ReadList();
+            Console.WriteLine("Handling Commandt: " + commands.Count);
+            OSManager instance = new OSManager();
+            instance.RunQuickAction(commands, _fromClient, nircmd);
         }
-        else
-            Console.WriteLine($"The client id is not matching");
-
-
+    }
+    public static void UIAnswerCommand(int _fromClient, Packet _packet)
+    {
+        if (CheckPacketValidity(_fromClient, _packet))
+        {
+            bool nircmd = _packet.ReadBool();
+            List<string> commands = _packet.ReadList();
+            Console.WriteLine("Handling Command: " + commands.Count);
+            OSManager instance = new OSManager();
+            instance.UIAnswer(commands, _fromClient, nircmd);
+        }
     }
     public static void SendFileCommands(int _fromClient, Packet packet)
     {
@@ -94,4 +90,29 @@ public class ServerHandle
     }
 
 
+    static bool CheckPacketValidity(int _fromClient, Packet _packet)
+    {
+        int clientIdCheck = _packet.ReadInt();
+        string username = _packet.ReadString();
+        string password = _packet.ReadString();
+        if (clientIdCheck == _fromClient)
+        {
+            if (DataAboutUser.UsnPwd.ContainsKey(username))
+            {
+                if (DataAboutUser.UsnPwd[username] == password)
+                {
+                    return true;
+                }
+                else
+                    Console.WriteLine($"The client password not matching");
+
+            }
+            else
+                Console.WriteLine($"The client username not matching");
+
+        }
+        else
+            Console.WriteLine($"The client id is not matching");
+        return false;
+    }
 }

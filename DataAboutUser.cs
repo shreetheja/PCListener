@@ -8,10 +8,10 @@ using System.Text;
 
 class DataAboutUser
 {
-    public List<String> usernames = new List<string>();
-    public List<String> CorrespondingPassword = new List<string>();
+    public static List<String> usernames = new List<string>() { "hi"};
+    public static List<String> CorrespondingPassword = new List<string>() { "hi"};
     public static Dictionary<string, string> UsnPwd = new Dictionary<string, string>();
-    public void Start()
+    public static void Initialize()
     {
         int count = 0;
         foreach (String s in usernames)

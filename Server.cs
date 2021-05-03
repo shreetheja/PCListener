@@ -140,9 +140,10 @@ public class Server
             {
                 {(int)ClientPackets.welcomeReceived,ServerHandle.WelcomeRecieved } ,
                 {(int)ClientPackets.SingleCommand,ServerHandle.SingleLineCommand },
-                {(int)ClientPackets.MultiCommands,ServerHandle.MultiLineCommands },
+                //{(int)ClientPackets.MultiCommands,ServerHandle.MultiLineCommands },
+                {(int)ClientPackets.QuickActions,ServerHandle.QuickActionCommand },
+                {(int)ClientPackets.UIAnswer,ServerHandle.UIAnswerCommand },
                 {(int)ClientPackets.SendFile,ServerHandle.SendFileCommands }
-
             };
         Console.WriteLine("Initialized the packets");
     }
