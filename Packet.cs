@@ -8,13 +8,13 @@ using System.Numerics;
 /// <summary>Sent from server to client.</summary>
 public enum ServerPackets
 {
-    welcome = 1, loginSuccess, invalidLogin, UIAnswer, QuickActions, CommandResult, CommandFinalResult, SentFile
+    welcome = 1, loginSuccess, invalidLogin, UIAnswer, QuickActions, QuickActionGamers, CommandResult, CommandFinalResult, SentFile
 }
 
 /// <summary>Sent from client to server.</summary>
 public enum ClientPackets
 {
-    welcomeReceived = 1, UIAnswer, QuickActions, SingleCommand, MultiCommands, SendFile
+    welcomeReceived = 1, UIAnswer, QuickActions,QuickActionGamers,Command,CloseCommands, SendFile
 }
 
 public class Packet : IDisposable

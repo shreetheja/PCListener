@@ -1,142 +1,166 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
+using System.Text;
 using System.IO;
-using System;
+using System.Diagnostics;
+using System.Threading;
+using System.ComponentModel;
 using System.Threading.Tasks;
-public class OSManager
+using System.Collections.Generic;
+
+class OSManager
 {
-    public delegate void SingleCommandHandler(string command, int toClient, bool nirCommand = false);
-    public delegate void MultiCommandHandler(List<string> command, int toClient, bool nirCommand = false);
-    public SingleCommandHandler SingleLine;
-    public MultiCommandHandler MultiLine;
-    public bool Executing = false;
-    public int NewCommand = 0;
-    public List<string> lastOut = new List<string>();
-    string NIRpath = "C:\\Users\\snsha\\Desktop\\NETWORK\\Server\\Assets\\nircmd-x64";
-    string lastBuffer;
-    private void Start()
+    public static List<OSManager> osManagerInstancesRunning = new List<OSManager>();
+    private StringBuilder commandOutput = null;
+    private int numOutputLines = 0;
+    private int ToClient;
+    private string Command;
+    private Process CMDProcess = new Process();
+    private CancellationToken Token;
+    
+
+
+    public void CommandLine(string _command, int _toClient, bool _nirCommand,CancellationToken token)
     {
-        // SingleLine = new SingleCommandHandler(IRunSingleCommand);
-        //MultiLine = new MultiCommandHandler(IRunMultilineCommands);
+        ToClient = _toClient;
+        Command = _command;
+        Token = token;
+        CMDProcess.StartInfo.FileName = "cmd.exe";
+        CMDProcess.StartInfo.UseShellExecute = false;
+        CMDProcess.StartInfo.RedirectStandardOutput = true;
+        CMDProcess.StartInfo.CreateNoWindow = false;
+        commandOutput = new StringBuilder();
+        CMDProcess.OutputDataReceived += OutputHandlerCommandASYNC;
+        CMDProcess.StartInfo.RedirectStandardInput = true;
+        if (_nirCommand)
+            CMDProcess.StartInfo.WorkingDirectory = Constants.nirCommandPath;
+        CMDProcess.Start();
+        StreamWriter sortStreamWriter = CMDProcess.StandardInput;
+        CMDProcess.BeginOutputReadLine();
+        sortStreamWriter.WriteLine(_command);
+        sortStreamWriter.Close();
+        CMDProcess.WaitForExit();
     }
-    private void LateUpdate()
+    public void QuickAction(string _command,int _toClient,bool _nirCommand, CancellationToken token)
     {
-        if (NewCommand < 0)
+        Console.WriteLine("Current work Direc: " + System.AppContext.BaseDirectory);
+        ToClient = _toClient;
+        Command = _command;
+        Token = token;
+        CMDProcess.StartInfo.FileName = "cmd.exe";
+        CMDProcess.StartInfo.UseShellExecute = false;
+        CMDProcess.StartInfo.RedirectStandardOutput = true;
+        commandOutput = new StringBuilder();
+        CMDProcess.StartInfo.RedirectStandardInput = true;
+        if (_nirCommand)
+            CMDProcess.StartInfo.WorkingDirectory = Constants.nirCommandPath;
+        CMDProcess.Start();
+        StreamWriter sortStreamWriter = CMDProcess.StandardInput;
+        sortStreamWriter.WriteLine(_command);
+        sortStreamWriter.Close();
+        CMDProcess.WaitForExit();
+        CMDProcess.Close();
+    }
+    public void UIAnswer(string _command,int _toClient,bool _nirCommand, CancellationToken token)
+    {
+        ToClient = _toClient;
+        Command = _command;
+        Token = token;
+        CMDProcess.StartInfo.FileName = "cmd.exe";
+        CMDProcess.StartInfo.UseShellExecute = false;
+        CMDProcess.StartInfo.RedirectStandardOutput = true;
+        commandOutput = new StringBuilder();
+        CMDProcess.OutputDataReceived += OutputHandlerUIAnswerAsync;
+        CMDProcess.StartInfo.RedirectStandardInput = true;
+        if (_nirCommand)
+            CMDProcess.StartInfo.WorkingDirectory = Constants.nirCommandPath;
+        CMDProcess.Start();
+        StreamWriter sortStreamWriter = CMDProcess.StandardInput;
+        CMDProcess.BeginOutputReadLine();
+        sortStreamWriter.WriteLine(_command);
+        sortStreamWriter.Close();
+        CMDProcess.WaitForExit();
+        CMDProcess.Close();
+    }
+    public void QuickActionGamers(string _command,int _toClient,bool _nirCommand, CancellationToken token)
+    {
+        ToClient = _toClient;
+        Command = _command;
+        Token = token;
+        CMDProcess.StartInfo.FileName = "cmd.exe";
+        CMDProcess.StartInfo.UseShellExecute = false;
+        CMDProcess.StartInfo.RedirectStandardOutput = true;
+        commandOutput = new StringBuilder();
+        CMDProcess.OutputDataReceived += OutputHandlerQuickActionGamersAsync;
+        CMDProcess.StartInfo.RedirectStandardInput = true;
+        if (_nirCommand)
+            CMDProcess.StartInfo.WorkingDirectory = Constants.nirCommandPath;
+        CMDProcess.Start();
+        StreamWriter sortStreamWriter = CMDProcess.StandardInput;
+        CMDProcess.BeginOutputReadLine();
+        sortStreamWriter.WriteLine(_command);
+        sortStreamWriter.Close();
+        CMDProcess.WaitForExit();
+        CMDProcess.Close();
+    }
+    
+
+    private void OutputHandlerCommandASYNC(object sendingProcess,DataReceivedEventArgs outLine)
+    {
+        if(Token.IsCancellationRequested)
         {
-            NewCommand = 0;
+            Console.WriteLine("Called Cancellation");
+            CMDProcess.CancelOutputRead();
         }
-    }//making the execution safe
-    public async Task RunSingleCommand(string command, int toClient, bool nirCommand = false, float timeOfExec = 1)
-    {
-        NewCommand++;
-        await IRunSingleCommand(command, toClient, nirCommand);
-    }
-    public async Task RunMultilineCommands(List<string> commands, int toClient, bool nirCommand = false)
-    {
-        NewCommand++;
-        Executing = false;
-        await IRunMultilineCommands(commands, toClient, nirCommand);
-    }
-    private async Task IRunSingleCommand(string command, int toClient, bool nirCommand)
-    {
-        Console.WriteLine("Executing : " + command);
-        Executing = true;
-        NewCommand--;
-        StreamWriter sw;
-        StreamReader sr;
-        StreamReader err;
-        string Line;
-        lastBuffer = "started";
-        using (Process pr = new Process())
+        if (!String.IsNullOrEmpty(outLine.Data))
         {
-            ProcessStartInfo pri = new ProcessStartInfo("cmd.exe")
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true
-            };
-            if (nirCommand)
-                pri.WorkingDirectory = NIRpath;
-            pr.StartInfo = pri;
-            pr.Start();
-            sr = pr.StandardOutput;
-            sw = pr.StandardInput;
-            err = pr.StandardError;
-            pr.StandardInput.WriteLine(command);
-            while ((Line = sr.ReadLine()) != null)
-            {
-                ServerSend.sendCommandResultLine(toClient, command, Line);
+            numOutputLines++;
+            commandOutput.Remove(0,commandOutput.Length);
+            commandOutput.Append(outLine.Data);
+            ServerSend.sendCommandResult(ToClient, Command, commandOutput.ToString());
 
-            }
-            Console.WriteLine("SendingFinal Command");
-            ServerSend.sendEndOfCommandResult(toClient, command, lastBuffer);
-            pr.Close();
-        }
-
-    }
-
-    internal void UIAnswer(List<string> command, int fromClient, bool nircmd)
-    {
-        Console.WriteLine("Executing UIAnswer Command");
-    }
-
-    internal void RunQuickAction(List<string> command, int fromClient, bool nircmd)
-    {
-        Console.WriteLine("Executing Quick Command");
-    }
-
-    private async Task IRunMultilineCommands(List<string> commands, int _toClient, bool nirCommand = false)
-    {
-        Console.WriteLine("Executing : " + commands.Count);
-        Executing = true;
-        NewCommand--;
-        StreamWriter sw;
-        StreamReader sr;
-        StreamReader err;
-        string Line;
-        lastBuffer = "started";
-        using (Process pr = new Process())
-        {
-            ProcessStartInfo pri = new ProcessStartInfo("cmd.exe")
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true
-            };
-            if (nirCommand)
-                pri.WorkingDirectory = NIRpath;
-            pr.StartInfo = pri;
-            pr.Start();
-            sr = pr.StandardOutput;
-            sw = pr.StandardInput;
-            err = pr.StandardError;
-            foreach(string command in commands)
-            pr.StandardInput.WriteLine(command);
-            while ((Line = sr.ReadLine()) != null)
-            {
-                Console.WriteLine("ReadLine: " + Line);
-                ServerSend.sendCommandResultLine(_toClient, String.Join("\n", commands), Line);
-            }
-            Console.WriteLine("SendingFinal Command");
-            ServerSend.sendEndOfCommandResult(_toClient, String.Join("\n", commands), lastBuffer); ;
-            pr.Close();
         }
     }
-    private void endSingleline()
+    private void OutputHandlerUIAnswerAsync(object sendingProcess,DataReceivedEventArgs outLine)
     {
-        Executing = false;
-        Console.WriteLine("CameOutSingle");
+        if (Token.IsCancellationRequested)
+        {
+            Console.WriteLine("Called Cancellation");
+            CMDProcess.CancelOutputRead();
+        }
+        if (!String.IsNullOrEmpty(outLine.Data))
+        {
+            numOutputLines++;
+            commandOutput.Remove(0, commandOutput.Length);
+            commandOutput.Append(outLine.Data);
+            ServerSend.sendUIAnswer(ToClient, Command, commandOutput.ToString());
 
+        }
     }
-    private void endMultiline(IAsyncResult t)
+    private void OutputHandlerQuickActionGamersAsync(object sendingProcess, DataReceivedEventArgs outLine)
     {
-        Executing = false;
-        Console.WriteLine("CameOutMulti");
+        if (Token.IsCancellationRequested)
+        {
+            Console.WriteLine("Called Cancellation");
+            CMDProcess.CancelOutputRead();
+        }
+        if (!String.IsNullOrEmpty(outLine.Data))
+        {
+            numOutputLines++;
+            commandOutput.Remove(0, commandOutput.Length);
+            commandOutput.Append(outLine.Data);
+            throw new NotImplementedException();
+           // ServerSend.sendCommandResultLine(ToClient, Command, commandOutput.ToString());
 
+        }
+    }
+
+    public void dispose()
+    {
+        CMDProcess.OutputDataReceived -= OutputHandlerCommandASYNC;
+        osManagerInstancesRunning.Remove(this);
     }
 }
+
+
+
+

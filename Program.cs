@@ -14,6 +14,7 @@ namespace RummyServer
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
             Server.Start(5, 26950);
+            Console.ReadKey();
         }
 
         private static void MainThread()

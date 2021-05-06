@@ -1,9 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
+using System.Threading;
+
 public class ServerHandle
 {
+    public static List<CancellationTokenSource> tokens = new List<CancellationTokenSource>(); 
 
+    #region WelcomeHandshake
+    /// <summary>
+    /// Handles First Handshake
+    /// </summary>
+    /// <param name="_fromClient"></param>
+    /// <param name="_packet"></param>
     public static void WelcomeRecieved(int _fromClient, Packet _packet)
     {
         int _clientIdCheck = _packet.ReadInt();
@@ -30,67 +40,161 @@ public class ServerHandle
             Server.clients[_fromClient].disconnect();
         }
     }
-    public async static void SingleLineCommand(int _fromClient, Packet _packet)
+    #endregion
+
+    #region CommandHandle
+    public async static void CommandHandle(int _fromClient, Packet _packet)
+    {
+        if(CheckPacketValidity(_fromClient,_packet))
+        {
+            bool nirCmd = _packet.ReadBool();
+            string command = _packet.ReadString();
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+            tokens.Add(source);
+            await Task.Run(() =>
+            CommandTask(_fromClient,command,nirCmd,token),token);
+            ServerSend.sendEndOfCommandResult(_fromClient, command, "\nEnd OF Running of these Commands .. ");
+        }
+        
+    }
+    private static void CommandTask(int _fromClient,string command,bool nircmd,CancellationToken Token)
+    {
+            OSManager instance = new OSManager();
+            OSManager.osManagerInstancesRunning.Add(instance);
+            string[] commands = command.Split('\n');
+            if (commands.Length > 1)
+            {
+                Console.WriteLine("RUNSINGLELINE : " + command);
+                instance.CommandLine(command, _fromClient, nircmd,Token);
+            }
+            else
+            {
+                Console.WriteLine("RUNMULTI : " + command);
+                instance.CommandLine(command, _fromClient, nircmd,Token);
+            }
+        
+    }
+    #endregion
+
+    #region QuickActionHandle
+    public async static void QuickActionCommand(int _fromClient, Packet _packet)
     {
         if (CheckPacketValidity(_fromClient, _packet))
         {
             bool nircmd = _packet.ReadBool();
             string command = _packet.ReadString();
-            Console.WriteLine("Handling Command : " + command);
-            OSManager instance = new OSManager();
-            string[] commands = command.Split('\n');
-            if (commands.Length > 1)
-            {
-                Console.WriteLine("RUNSINGLELINE : " + command);
-                await instance.RunSingleCommand(command, _fromClient, nircmd);
-            }
-            else
-            {
-                Console.WriteLine("RUNMULTI : " + command);
-                await instance.RunMultilineCommands(new List<string>() { command}, _fromClient, nircmd);
-            }
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+            tokens.Add(source);
+            await Task.Run(() =>QuickActionTask(_fromClient,command,nircmd,token),token);
+        }
+        
+    }
+    private static void QuickActionTask(int _fromClient,string Command,bool nircmd,CancellationToken token)
+    {
+        OSManager instance = new OSManager();
+        string[] commands = Command.Split('\n');
+        OSManager.osManagerInstancesRunning.Add(instance);
+        if (commands.Length > 1)
+        {
+            instance.QuickAction(Command, _fromClient, nircmd,token);
+        }
+        else
+        {
+            instance.QuickAction(Command, _fromClient, nircmd,token);
         }
     }
-    //public static void MultiLineCommands(int _fromClient, Packet _packet)
-    //{
-    //    if (CheckPacketValidity(_fromClient, _packet))
-    //    {
-    //        bool nircmd = _packet.ReadBool();
-    //        List<string> commandList = _packet.ReadList();
-    //        Console.WriteLine("Handling Command Lenght: " + commandList.Count);
-    //        OSManager instance = new OSManager();
-    //        instance.RunMultilineCommands(commandList, _fromClient, nircmd);
-    //    }
-    //}
-    public static void QuickActionCommand(int _fromClient, Packet _packet)
+    #endregion
+
+    #region UIAnswer
+    public async static void UIAnswerCommand(int _fromClient, Packet _packet)
+    {
+        
+        if (CheckPacketValidity(_fromClient, _packet))
+        {
+            Console.WriteLine("Recieved UI Command");
+            bool nircmd = _packet.ReadBool();
+            string command = _packet.ReadString();
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+            tokens.Add(source);
+            await Task.Run(() => UIAnswerTask(_fromClient, command, nircmd,token),token);
+        }
+    }
+    private static void UIAnswerTask(int _fromClient,string Command,bool nircmd,CancellationToken token)
+    {
+        OSManager instance = new OSManager();
+        string[] commands = Command.Split('\n');
+        OSManager.osManagerInstancesRunning.Add(instance);
+        if (commands.Length > 1)
+        {
+            instance.UIAnswer(Command, _fromClient, nircmd,token);
+        }
+        else
+        {
+            instance.UIAnswer(Command, _fromClient, nircmd,token);
+        }
+    }
+    #endregion
+    
+    #region QuickActionGamers
+    public async static void QuickActionGamers(int _fromClient, Packet _packet)
     {
         if (CheckPacketValidity(_fromClient, _packet))
         {
             bool nircmd = _packet.ReadBool();
-            List<string> commands = _packet.ReadList();
-            Console.WriteLine("Handling Commandt: " + commands.Count);
-            OSManager instance = new OSManager();
-            instance.RunQuickAction(commands, _fromClient, nircmd);
+            string command = _packet.ReadString();
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+            tokens.Add(source);
+            await Task.Run(() => QuickActionGamersTask(_fromClient, command, nircmd,token),token);
         }
     }
-    public static void UIAnswerCommand(int _fromClient, Packet _packet)
+    private static void QuickActionGamersTask(int _fromClient, string Command, bool nircmd,CancellationToken token)
     {
-        if (CheckPacketValidity(_fromClient, _packet))
+        OSManager instance = new OSManager();
+        string[] commands = Command.Split('\n');
+        OSManager.osManagerInstancesRunning.Add(instance);
+        if (commands.Length > 1)
         {
-            bool nircmd = _packet.ReadBool();
-            List<string> commands = _packet.ReadList();
-            Console.WriteLine("Handling Command: " + commands.Count);
-            OSManager instance = new OSManager();
-            instance.UIAnswer(commands, _fromClient, nircmd);
+            instance.QuickActionGamers(Command, _fromClient, nircmd,token);
+        }
+        else
+        {
+            instance.QuickActionGamers(Command, _fromClient, nircmd,token);
         }
     }
+    #endregion
+
+    #region EXPTFileSend
     public static void SendFileCommands(int _fromClient, Packet packet)
     {
         ServerSend.SendFile(_fromClient, packet.ReadString());
     }
+    private static void SendFileTask()
+    {
 
+    }
+    #endregion
 
-    static bool CheckPacketValidity(int _fromClient, Packet _packet)
+    #region CLOSEALl
+    public static void CloseAllOsManager(int _fromClient,Packet Packet)
+    {
+        if (CheckPacketValidity(_fromClient, Packet))
+        {
+            foreach(CancellationTokenSource Source in tokens)
+            {
+                Source.Cancel();
+            }
+            tokens.Clear();
+                
+        }
+    }
+    #endregion
+
+    #region HelperMethods
+    private static bool CheckPacketValidity(int _fromClient, Packet _packet)
     {
         int clientIdCheck = _packet.ReadInt();
         string username = _packet.ReadString();
@@ -115,4 +219,5 @@ public class ServerHandle
             Console.WriteLine($"The client id is not matching");
         return false;
     }
+    #endregion
 }

@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Client" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAACAAAAAAAEAEAAAAAAAAAAAAAAAAEIgA=</HashCode>
+      <FileName>Client.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DataAboutUser" Collapsed="true">
+    <Position X="11" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAIAAAAAEACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataAboutUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSManager" Collapsed="true">
+    <Position X="2.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACQAAAAACGAAIABIQAAIAAgAQAAAAAAAAEIEAAACAg=</HashCode>
+      <FileName>OSManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Packet" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIACAwAACAAVAAAAAAYAABAAIAAAUABIABAgAFAAQA=</HashCode>
+      <FileName>Packet.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ProcessTest" Collapsed="true">
+    <Position X="0.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAACAAAABAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>ProcessTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Server" Collapsed="true">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAAAEAAAAAAgCABgAQAAAAAAEBAACAA=</HashCode>
+      <FileName>Server.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ServerHandle" Collapsed="true">
+    <Position X="4.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAABAAAAAAAAAAAAAAAAAAAIAAAIAAAAIA=</HashCode>
+      <FileName>ServerHandle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ServerSend" Collapsed="true">
+    <Position X="6.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAiAAAAAAAKAAAAAAAAAAAQABAABAAAQBAACAAAAA=</HashCode>
+      <FileName>ServerSend.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ThreadManager" Collapsed="true">
+    <Position X="11" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAABAAAQAAAAAAQAAAAAAAAAAAAEAAEAAAAA=</HashCode>
+      <FileName>ThreadManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RummyServer.Constants" Collapsed="true">
+    <Position X="11" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Constants.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RummyServer.GameLogic" Collapsed="true">
+    <Position X="11" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GameLogic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RummyServer.Program" Collapsed="true">
+    <Position X="11" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="ServerPackets" Collapsed="true">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAABAAACAAAAAAAAAAAAEAAAEAAAAAAAAQEAAAAIA=</HashCode>
+      <FileName>Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ClientPackets" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAABAAAAAIAAAAAAAAAEAAAAAAAAAAAAAEAIAAAA=</HashCode>
+      <FileName>Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

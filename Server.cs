@@ -139,11 +139,12 @@ public class Server
         PacketHandlers = new Dictionary<int, PacketHandler>()
             {
                 {(int)ClientPackets.welcomeReceived,ServerHandle.WelcomeRecieved } ,
-                {(int)ClientPackets.SingleCommand,ServerHandle.SingleLineCommand },
-                //{(int)ClientPackets.MultiCommands,ServerHandle.MultiLineCommands },
+                {(int)ClientPackets.Command,ServerHandle.CommandHandle },
                 {(int)ClientPackets.QuickActions,ServerHandle.QuickActionCommand },
                 {(int)ClientPackets.UIAnswer,ServerHandle.UIAnswerCommand },
-                {(int)ClientPackets.SendFile,ServerHandle.SendFileCommands }
+                {(int)ClientPackets.SendFile,ServerHandle.SendFileCommands },
+                {(int)ClientPackets.CloseCommands,ServerHandle.CloseAllOsManager }
+
             };
         Console.WriteLine("Initialized the packets");
     }
