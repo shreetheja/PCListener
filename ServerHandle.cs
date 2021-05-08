@@ -120,6 +120,7 @@ public class ServerHandle
             CancellationToken token = source.Token;
             tokens.Add(source);
             await Task.Run(() => UIAnswerTask(_fromClient, command, nircmd,token),token);
+            ServerSend.sendUIAnswer(_fromClient, "", "", true); //signal
         }
     }
     private static void UIAnswerTask(int _fromClient,string Command,bool nircmd,CancellationToken token)
@@ -143,26 +144,26 @@ public class ServerHandle
     {
         if (CheckPacketValidity(_fromClient, _packet))
         {
-            bool nircmd = _packet.ReadBool();
             string command = _packet.ReadString();
             CancellationTokenSource source = new CancellationTokenSource();
             CancellationToken token = source.Token;
             tokens.Add(source);
-            await Task.Run(() => QuickActionGamersTask(_fromClient, command, nircmd,token),token);
+            await Task.Run(() => QuickActionGamersTask(_fromClient, command,token),token);
+            ServerSend.sendQuickGamersCommandResult(_fromClient, command, "\nEnd OF Running of these Commands .. ",true);
         }
     }
-    private static void QuickActionGamersTask(int _fromClient, string Command, bool nircmd,CancellationToken token)
+    private static void QuickActionGamersTask(int _fromClient, string Command,CancellationToken token)
     {
         OSManager instance = new OSManager();
         string[] commands = Command.Split('\n');
         OSManager.osManagerInstancesRunning.Add(instance);
         if (commands.Length > 1)
         {
-            instance.QuickActionGamers(Command, _fromClient, nircmd,token);
+            instance.QuickActionGamers(Command, _fromClient,token);
         }
         else
         {
-            instance.QuickActionGamers(Command, _fromClient, nircmd,token);
+            instance.QuickActionGamers(Command, _fromClient,token);
         }
     }
     #endregion

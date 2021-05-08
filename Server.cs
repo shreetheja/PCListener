@@ -143,7 +143,9 @@ public class Server
                 {(int)ClientPackets.QuickActions,ServerHandle.QuickActionCommand },
                 {(int)ClientPackets.UIAnswer,ServerHandle.UIAnswerCommand },
                 {(int)ClientPackets.SendFile,ServerHandle.SendFileCommands },
-                {(int)ClientPackets.CloseCommands,ServerHandle.CloseAllOsManager }
+                {(int)ClientPackets.CloseCommands,ServerHandle.CloseAllOsManager },
+                {(int)ClientPackets.QuickActionGamers,ServerHandle.QuickActionGamers }
+
 
             };
         Console.WriteLine("Initialized the packets");

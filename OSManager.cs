@@ -42,7 +42,6 @@ class OSManager
     }
     public void QuickAction(string _command,int _toClient,bool _nirCommand, CancellationToken token)
     {
-        Console.WriteLine("Current work Direc: " + System.AppContext.BaseDirectory);
         ToClient = _toClient;
         Command = _command;
         Token = token;
@@ -59,6 +58,7 @@ class OSManager
         sortStreamWriter.Close();
         CMDProcess.WaitForExit();
         CMDProcess.Close();
+        
     }
     public void UIAnswer(string _command,int _toClient,bool _nirCommand, CancellationToken token)
     {
@@ -81,7 +81,7 @@ class OSManager
         CMDProcess.WaitForExit();
         CMDProcess.Close();
     }
-    public void QuickActionGamers(string _command,int _toClient,bool _nirCommand, CancellationToken token)
+    public void QuickActionGamers(string _command,int _toClient, CancellationToken token)
     {
         ToClient = _toClient;
         Command = _command;
@@ -92,8 +92,6 @@ class OSManager
         commandOutput = new StringBuilder();
         CMDProcess.OutputDataReceived += OutputHandlerQuickActionGamersAsync;
         CMDProcess.StartInfo.RedirectStandardInput = true;
-        if (_nirCommand)
-            CMDProcess.StartInfo.WorkingDirectory = Constants.nirCommandPath;
         CMDProcess.Start();
         StreamWriter sortStreamWriter = CMDProcess.StandardInput;
         CMDProcess.BeginOutputReadLine();
@@ -148,8 +146,7 @@ class OSManager
             numOutputLines++;
             commandOutput.Remove(0, commandOutput.Length);
             commandOutput.Append(outLine.Data);
-            throw new NotImplementedException();
-           // ServerSend.sendCommandResultLine(ToClient, Command, commandOutput.ToString());
+            ServerSend.sendQuickGamersCommandResult(ToClient, Command, commandOutput.ToString());
 
         }
     }

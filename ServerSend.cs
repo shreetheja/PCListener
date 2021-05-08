@@ -116,10 +116,11 @@ public class ServerSend
     /// <param name="_toClient"></param>
     /// <param name="Command">Command which is stored in form of list shud be sent in list form to match the type in client side</param>
     /// <param name="res">Result line </param>
-    public static void sendUIAnswer(int _toClient, string Command, string res)  
+    public static void sendUIAnswer(int _toClient, string Command, string res,bool isFinal = false)  
     {
         using (Packet _packet = new Packet((int)ServerPackets.UIAnswer))
         {
+            _packet.Write(isFinal);
             _packet.Write(Command);
             _packet.Write(res);
             SendTCPData(_toClient, _packet);
@@ -158,6 +159,24 @@ public class ServerSend
             SendTCPData(_toClient, _packet);
         }
     }
+
+    /// <summary>
+    /// Sending the Result Line By line Executed by a asynchronous process of quick action
+    /// </summary>
+    /// <param name="_toClient"></param>
+    /// <param name="Command"></param>
+    /// <param name="Finalres"></param>
+    public static void sendQuickGamersCommandResult(int _toClient, string Command,string result,bool isFinalRes = false)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.QuickActionGamers))
+        {
+            _packet.Write(Command);
+            _packet.Write(result);
+            _packet.Write(isFinalRes);
+            SendTCPData(_toClient, _packet);
+        }
+    }
+
 
 
     /// <summary>
